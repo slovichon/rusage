@@ -1,4 +1,6 @@
 .\" $Id$
+.\" Written by Jared Yanovich
+.\" This file belongs to the public domain.
 .Dd August 25, 2004
 .Dt RUSAGE 1
 .Os
@@ -15,6 +17,41 @@ The
 utility runs the given
 .Ar command
 and displays its resource usage when it is finished.
+.Pp
+The fields
+.Nm
+displays have the following meanings:
+.Pp
+.Bl -tag -width indent -compact -offset indent
+.It real
+Total time.
+.It user
+Total CPU time in user mode.
+.It sys
+Total CPU time in kernel mode.
+.It pf
+Number of page faults.
+.It pr
+Number of page reclaims.
+.It sw
+Number of pages swapped out.
+.It rb
+Number of blocks read.
+.It wb
+Number of blocks written.
+.It vcx
+Number of voluntary context switches.
+.It icx
+Number of involuntary context switches.
+.It mx
+Maximum resident set size.
+.It ix
+Integral shared text memory size.
+.It id
+Integral unshared data size.
+.It is
+Integral unshared stack size.
+.El
 .Pp
 .Nm
 exits with the exit status of the
