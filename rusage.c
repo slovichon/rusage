@@ -18,57 +18,17 @@
 #include <sysexits.h>
 #include <unistd.h>
 
-static void usage(void) __attribute__((__noreturn__));
+void usage(void) __attribute__((__noreturn__));
 
 int
 main(int argc, char *argv[])
 {
 	struct timeval *rt, *ut, *st, tb, ta;
-	char *p, *path, *cp, *prog;
-	extern char **environ;
 	struct rusage ru;
-	struct stat stb;
 	int status;
 
 	if (argc < 2)
 		usage();
-
-	prog = argv[1];
-
-	if (prog[0] == '/') {
-		if ((p = strdup(prog)) == NULL)
-			err(EX_OSERR, "strdup");
-#if 0
-	} else if (strchr(prog, '/') != NULL) {
-		char buf[MAXPATHLEN];
-
-		(void)getcwd(buf);
-		snprintf(buf, sizeof(buf), "%s/%s", buf, prog);
-		if ((p = strdup(buf)) == NULL)
-			err(EX_OSERR, "strdup");
-#endif
-	} else {
-		char buf[MAXPATHLEN];
-
-		path = getenv("PATH");
-		p = NULL;
-		for (; path != NULL; path = cp) {
-			if ((cp = strchr(path, ':')) != NULL)
-				*cp++ = '\0';
-			snprintf(buf, sizeof(buf), "%s/%s", path, prog);
-			if (stat(buf, &stb) != -1) {
-				if ((p = strdup(buf)) == NULL)
-					err(EX_OSERR, "strdup");
-				break;
-			}
-			if (errno != ENOENT)
-				err(EX_OSERR, "stat %s", buf);
-		}
-		if (p == NULL) {
-			errno = ENOENT;
-			err(EX_DATAERR, "%s", prog);
-		}
-	}
 
 	(void)gettimeofday(&tb, (struct timezone *)NULL);
 	switch (fork()) {
@@ -76,13 +36,13 @@ main(int argc, char *argv[])
 		err(EX_OSERR, "fork");
 		/* NOTREACHED */
 	case 0:
-		(void)execve(p, argv + 1, environ);
-		err(EX_OSERR, "execve %s", p);
+		(void)execvp(argv[1], argv + 1);
+		err(EX_OSERR, "execve %s", argv[1]);
 		/* NOTREACHED */
 	}
 	(void)wait(&status);
 	(void)gettimeofday(&ta, (struct timezone *)NULL);
-	free(p);
+
 	if (getrusage(RUSAGE_CHILDREN, &ru) == -1)
 		err(EX_OSERR, "getrusage");
 	ut = &ru.ru_utime;
@@ -111,36 +71,7 @@ main(int argc, char *argv[])
 	exit(status);
 }
 
-static char *
-getpath(const char *prog, const char *e)
-{
-	char *env, *p, path[MAXPATHLEN];
-	struct stat stb;
-
-	if ((env = strdup(e)) == NULL)
-		err(EX_OSERR, "strdup");
-
-	path[0] = '\0';
-	for (; env != NULL; env = p) {
-		p = strchr(env, ':');
-		if (p != NULL)
-			*p++ = '\0';
-		(void)snprintf(path, sizeof(path), "%s/%s", env, prog);
-		if (stat(path, &stb) == -1) {
-			switch (errno) {
-			case ENOENT:
-				break;
-			default:
-				err(EX_OSERR, "%s", path);
-			}
-		}
-	}
-	free(env);
-	return (*path == '\0' ? NULL : strdup(path));
-}
-
-
-static void
+void
 usage(void)
 {
 	extern char *__progname;
