@@ -34,6 +34,15 @@ main(int argc, char *argv[])
 	if (prog[0] == '/') {
 		if ((p = strdup(prog)) == NULL)
 			err(EX_OSERR, "strdup");
+#if 0
+	} else if (strchr(prog, '/') != NULL) {
+		char buf[MAXPATHLEN];
+
+		(void)getcwd(buf);
+		snprintf(buf, sizeof(buf), "%s/%s", buf, prog);
+		if ((p = strdup(buf)) == NULL)
+			err(EX_OSERR, "strdup");
+#endif
 	} else {
 		char buf[MAXPATHLEN];
 
