@@ -107,6 +107,35 @@ main(int argc, char *argv[])
 	exit(status);
 }
 
+static char *
+getpath(const char *prog, const char *e)
+{
+	char *env, *p, path[MAXPATHLEN];
+	struct stat stb;
+
+	if ((env = strdup(e)) == NULL)
+		err(EX_OSERR, "strdup");
+
+	path[0] = '\0';
+	for (; env != NULL; env = p) {
+		p = strchr(env, ':');
+		if (p != NULL)
+			*p++ = '\0';
+		(void)snprintf(path, sizeof(path), "%s/%s", env, prog);
+		if (stat(path, &stb) == -1) {
+			switch (errno) {
+			case ENOENT:
+				break;
+			default:
+				err(EX_OSERR, "%s", path);
+			}
+		}
+	}
+	free(env);
+	return (*path == '\0' ? NULL : strdup(path));
+}
+
+
 static __dead void
 usage(void)
 {
