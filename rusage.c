@@ -1,4 +1,8 @@
 /* $Id$ */
+/*
+ * Written by Jared Yanovich
+ * This file belongs to the public domain.
+ */
 
 #include <sys/param.h>
 #include <sys/stat.h>
@@ -14,7 +18,7 @@
 #include <sysexits.h>
 #include <unistd.h>
 
-static __dead void usage(void);
+static void usage(void) __attribute__((__noreturn__));
 
 int
 main(int argc, char *argv[])
@@ -136,7 +140,7 @@ getpath(const char *prog, const char *e)
 }
 
 
-static __dead void
+static void
 usage(void)
 {
 	extern char *__progname;
