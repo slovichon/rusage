@@ -1,0 +1,52 @@
+.\" $Id$
+.Dd August 25, 2004
+.Dt RUSAGE 1
+.Os
+.Sh NAME
+.Nm rusage
+.Nd run a command and display its resource usage
+.Sh SYNOPSIS
+.Nm rusage
+.Ar command
+.Op Ar argument ...
+.Sh DESCRIPTION
+The
+.Nm
+utility runs the given
+.Ar command
+and displays its resource usage when it is finished.
+.Pp
+.Nm
+exits with the exit status of the
+.Ar command
+if it could execute the command properly or with one of the error codes
+from
+.Xr sysexits 3
+on failiure.
+.Sh ENVIRONMENT
+.Nm
+recognizes the following environmental variables:
+.Bl -tag -width 8n
+.It Ev PATH
+This list of directories separated by colon
+.Pq Sq \&:
+characters will be searched for the executable file specified in
+.Ar command .
+.El
+.Sh SEE ALSO
+.Xr ksh 1 ,
+.Xr getrusage 2 ,
+.Xr sysexits 3
+.Sh BUGS
+.Nm
+displays accumulated resource usage used by
+.Sy all
+child processes the given
+.Ar command
+generates.
+There is no way to specify that only resources used by
+.Ar command ,
+independently of any of its child processes, be displayed.
+.Pp
+.Nm
+is not perfect.
